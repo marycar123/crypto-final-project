@@ -1,6 +1,7 @@
 """End to end encryption of files."""
 
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+from cryptography.hazmat.primitives.asymmetric import ec
 
 nonce_ctr = 2**28
 
