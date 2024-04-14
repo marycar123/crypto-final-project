@@ -4,25 +4,8 @@ from etoe import decryption, encryption, keygen, enc_name, dec_name
 
 def run(myFileName: str, keyFileName: str, nameKeyFileName: str) -> bool:
 
-    file = open(myFileName, "r")
-    myFile = file.read()
-    myFile = myFile.encode('utf-8')
-
-    #Key generation, will store key at this file 
-    keygen(keyFileName)
-    #encrypting file and giving the key store in that file's keyFile
-    ct=encryption(myFile, keyFileName)     
-    #TODO: encrypt file name 
-
-    keygen(nameKeyFileName)
-    myFileName = myFileName.encode('utf-8')
-    encrypted_name = enc_name(myFileName, nameKeyFileName)
-
-
-
-    encryptedFile = open(encrypted_name + ".txt", "w")
-    encryptedFile.write(ct)
-    encryptedFile.close()
+    ct, myFile = enc_and_upload(myFileName, keyFileName, nameKeyFileName)
+    
 
     #decrypting        
 
@@ -30,6 +13,31 @@ def run(myFileName: str, keyFileName: str, nameKeyFileName: str) -> bool:
 
     return result == myFile
 
+
+def enc_and_upload(myFileName: str, keyFileName: str, nameKeyFileName: str):
+    file = open(myFileName, "r")
+    myFile = file.read()
+    myFile = myFile.encode('utf-8')
+
+    #Key generation, will store key at this file 
+    keygen(keyFileName)
+    #encrypting file and giving the key store in that file's keyFile
+    ct=encryption(myFile, keyFileName)    
+    #TODO: encrypt file name 
+
+    keygen(nameKeyFileName)
+    myFileName = myFileName.encode('utf-8')
+    encrypted_name = enc_name(myFileName, nameKeyFileName)
+
+    encryptedFile = open(encrypted_name[0].hex()+encrypted_name[1].hex() + ".txt", "wb")
+
+    encryptedFile.write(str(ct[0][0]).encode('utf-8'))
+    encryptedFile.write(str(ct[0][1]).encode('utf-8'))
+    encryptedFile.write(ct[1])
+    encryptedFile.close()
+
+    return ct, myFile
+    
 
 
 if __name__ == '__main__':

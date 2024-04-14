@@ -48,6 +48,7 @@ def enc_name(pt: bytes, keyFileName: str) -> bytes:
 
     cipher = Cipher(AES256(key), modes.CBC(iv))
     encryptor = cipher.encryptor()
+    pt = pad_file_name(pt)
     ct = encryptor.update(pt) + encryptor.finalize()
     return (iv, ct)
 
@@ -61,3 +62,8 @@ def dec_name(ct: bytes, keyFileName: str) -> bytes:
     decryptor = cipher.decryptor()
     pt = decryptor.update(ct[1]) + decryptor.finalize()
     return pt
+
+def pad_file_name(name: str) -> str:
+    padding_length = 16 - (len(name) % 16)
+    padding = bytes([padding_length]) * padding_length
+    return name + padding
