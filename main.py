@@ -18,7 +18,6 @@ def run(myFileName: str, keyFileName: str, nameKeyFileName: str) -> bool:
     name_decrypt = name_decrypt.decode('utf-8')
     name_decrypt = name_decrypt[:(len(myFileName))]
 
-
     return result == my_file and name_decrypt == myFileName
 
 
