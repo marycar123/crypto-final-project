@@ -4,14 +4,22 @@ from etoe import decryption, encryption, keygen, enc_name, dec_name
 
 def run(myFileName: str, keyFileName: str, nameKeyFileName: str) -> bool:
 
-    ct, myFile = enc_and_upload(myFileName, keyFileName, nameKeyFileName)
+    #encrypts everything
+    ct, my_file, encrypted_file = enc_and_upload(myFileName, keyFileName, nameKeyFileName)
     
 
     #decrypting        
 
     result = decryption(ciphertext = ct, keyFileName = keyFileName)
 
-    return result == myFile
+    #checking name decryption
+
+    name_decrypt = dec_name(encrypted_file, nameKeyFileName)
+    name_decrypt = name_decrypt.decode('utf-8')
+    name_decrypt = name_decrypt[:(len(myFileName))]
+
+
+    return result == my_file and name_decrypt == myFileName
 
 
 def enc_and_upload(myFileName: str, keyFileName: str, nameKeyFileName: str):
@@ -23,7 +31,7 @@ def enc_and_upload(myFileName: str, keyFileName: str, nameKeyFileName: str):
     keygen(keyFileName)
     #encrypting file and giving the key store in that file's keyFile
     ct=encryption(myFile, keyFileName)    
-    #TODO: encrypt file name 
+    
 
     keygen(nameKeyFileName)
     myFileName = myFileName.encode('utf-8')
@@ -36,7 +44,7 @@ def enc_and_upload(myFileName: str, keyFileName: str, nameKeyFileName: str):
     encryptedFile.write(ct[1])
     encryptedFile.close()
 
-    return ct, myFile
+    return ct, myFile, encrypted_name
     
 
 

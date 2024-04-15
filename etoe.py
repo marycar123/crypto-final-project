@@ -56,11 +56,17 @@ def dec_name(ct: bytes, keyFileName: str) -> bytes:
     file = open(keyFileName, "r")
     key = file.read()
     key = key.encode('utf-8')
+    file.close()
+
+    iv: bytes = b'0'
+    cyt: bytes = b'0'
+
+    iv, cyt = ct
 
     #check to see if this parses for the IV right
-    cipher = Cipher(AES256(key), modes.CBC(ct[0]))
+    cipher = Cipher(AES256(key), modes.CBC(iv))
     decryptor = cipher.decryptor()
-    pt = decryptor.update(ct[1]) + decryptor.finalize()
+    pt = decryptor.update(cyt) + decryptor.finalize()
     return pt
 
 def pad_file_name(name: str) -> str:
