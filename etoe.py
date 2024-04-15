@@ -1,6 +1,9 @@
 """End to end encryption of files."""
 
+import os
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+from cryptography.hazmat.primitives.ciphers import Cipher,modes
+from cryptography.hazmat.primitives.ciphers.algorithms import AES256
 from cryptography.hazmat.primitives.asymmetric import ec
 
 nonce_ctr = 2**28
@@ -35,3 +38,38 @@ def decryption(ciphertext: bytes, keyFileName: bytes) -> bytes:
     pt = cipher.decrypt(data=ciphertext[1], associated_data=bytes(ciphertext[0][1], 'ascii'), nonce=bytes(str(ciphertext[0][0]), 'ascii'))
     return pt 
 
+
+def enc_name(pt: bytes, keyFileName: str) -> bytes:
+    file = open(keyFileName, "r")
+    key = file.read()
+    key = key.encode('utf-8')
+
+    iv = os.urandom(16)
+
+    cipher = Cipher(AES256(key), modes.CBC(iv))
+    encryptor = cipher.encryptor()
+    pt = pad_file_name(pt)
+    ct = encryptor.update(pt) + encryptor.finalize()
+    return (iv, ct)
+
+def dec_name(ct: bytes, keyFileName: str) -> bytes: 
+    file = open(keyFileName, "r")
+    key = file.read()
+    key = key.encode('utf-8')
+    file.close()
+
+    iv: bytes = b'0'
+    cyt: bytes = b'0'
+
+    iv, cyt = ct
+
+    #check to see if this parses for the IV right
+    cipher = Cipher(AES256(key), modes.CBC(iv))
+    decryptor = cipher.decryptor()
+    pt = decryptor.update(cyt) + decryptor.finalize()
+    return pt
+
+def pad_file_name(name: str) -> str:
+    padding_length = 16 - (len(name) % 16)
+    padding = bytes([padding_length]) * padding_length
+    return name + padding
