@@ -96,6 +96,6 @@ if __name__ == '__main__':
     keyFileName="key_thisFile.txt"
     nameKeyFileName = "nameKey_thisFile.txt"
 
-    #print(run(myFileName=myFileName, keyFileName=keyFileName, nameKeyFileName=nameKeyFileName))
-    download_and_decrypt("23f2673bc3f956ba88e673fb4c83dd067943500b429f0aae732d36315bedf13d.txt",keyFileName, nameKeyFileName)
+    print(run(myFileName=myFileName, keyFileName=keyFileName, nameKeyFileName=nameKeyFileName))
+    #download_and_decrypt("23f2673bc3f956ba88e673fb4c83dd067943500b429f0aae732d36315bedf13d.txt",keyFileName, nameKeyFileName)
 
