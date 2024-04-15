@@ -45,6 +45,40 @@ def enc_and_upload(myFileName: str, keyFileName: str, nameKeyFileName: str):
 
     return ct, myFile, encrypted_name
     
+def download_and_decrypt(downloadName, keyFileName, nameKeyFileName):
+
+    #downloads the file from google drive
+    file_download(downloadName)
+
+    #breaks the given file name down to IV and encrypted
+    encrypted_bytes_1 = bytes.fromhex(downloadName[:32])
+    encrypted_bytes_2 = bytes.fromhex(downloadName[32:64])
+    name_tuple = (encrypted_bytes_1, encrypted_bytes_2)
+
+    #decypt and prase the name to get the origional file name
+    name_decrypt = dec_name(name_tuple, nameKeyFileName)
+    name_decrypt = name_decrypt.decode('utf-8')
+    name_decrypt = name_decrypt[:(len(myFileName))]
+
+    #download encrypted contents
+    file = open(downloadName, "rb")
+    ct = file.read()
+
+    #parse the contents for nonce and encryption key for the file
+    header = (ct[:9],ct[9:25])
+    reconstructedCt =(header, ct[25:])   
+    
+    #decrypt the file contents
+    result = decryption(ciphertext = reconstructedCt, keyFileName = keyFileName)
+
+    #create a new file under the decrypted name and write the decypted contents to it
+    decrypted_file = open(name_decrypt, "w")
+    decrypted_file.write(result.decode('utf-8'))
+    decrypted_file.close()
+    os.remove(downloadName)
+
+    return None
+
 
 
 if __name__ == '__main__':
