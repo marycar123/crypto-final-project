@@ -1,6 +1,7 @@
 
 from etoe import decryption, encryption, keygen, enc_name, dec_name
-
+from upload_download import file_upload, file_download
+import os
 
 def run(file_name: str, key_file_name: str, namekey_file_name: str) -> bool:
 
@@ -49,6 +50,40 @@ def enc_and_upload(file_name: str, key_file_name: str, namekey_file_name: str):
 
     return ct, myFile, iv, encrypted_name
     
+def download_and_decrypt(download_name: str, key_file_name: str, name_key_file_name: str):
+
+    #downloads the file from google drive
+    file_download(download_name)
+
+    #breaks the given file name down to IV and encrypted
+    encrypted_bytes_1 = bytes.fromhex(download_name[:32])
+    encrypted_bytes_2 = bytes.fromhex(download_name[32:64])
+    name_tuple = (encrypted_bytes_1, encrypted_bytes_2)
+
+    #decypt and prase the name to get the origional file name
+    name_decrypt = dec_name(name_tuple, name_key_file_name)
+    name_decrypt = name_decrypt.decode('utf-8')
+    name_decrypt = name_decrypt[:(len(name_key_file_name))]
+
+    #download encrypted contents
+    file = open(download_name, "rb")
+    ct = file.read()
+
+    #parse the contents for nonce and encryption key for the file
+    header = (ct[:9],ct[9:25])
+    reconstructedCt =(header, ct[25:])   
+    
+    #decrypt the file contents
+    result = decryption(ciphertext = reconstructedCt, key_file_name=key_file_name,enc_title= encrypted_bytes_1)
+
+    #create a new file under the decrypted name and write the decypted contents to it
+    decrypted_file = open(name_decrypt, "w")
+    decrypted_file.write(result.decode('utf-8'))
+    decrypted_file.close()
+    os.remove(download_name)
+
+    return None
+
 
 
 if __name__ == '__main__':
@@ -60,5 +95,6 @@ if __name__ == '__main__':
     key_file_name="key_thisFile.txt"
     namekey_file_name = "nameKey_thisFile.txt"
 
-    print(run(file_name=file_name, key_file_name=key_file_name, namekey_file_name=namekey_file_name))
+    #print(run(myFileName=myFileName, keyFileName=keyFileName, nameKeyFileName=nameKeyFileName))
+    download_and_decrypt("23f2673bc3f956ba88e673fb4c83dd067943500b429f0aae732d36315bedf13d.txt",key_file_name, namekey_file_name)
 
