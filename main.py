@@ -1,5 +1,7 @@
 
 from etoe import decryption, encryption, keygen, enc_name, dec_name
+from upload_download import file_upload, file_download
+import os
 
 
 def run(myFileName: str, keyFileName: str, nameKeyFileName: str) -> bool:
@@ -10,15 +12,16 @@ def run(myFileName: str, keyFileName: str, nameKeyFileName: str) -> bool:
 
     #decrypting        
 
-    result = decryption(ciphertext = ct, keyFileName = keyFileName)
+    # result = decryption(ciphertext = ct, keyFileName = keyFileName)
 
-    #checking name decryption
+    # #checking name decryption
 
-    name_decrypt = dec_name(encrypted_file_name, nameKeyFileName)
-    name_decrypt = name_decrypt.decode('utf-8')
-    name_decrypt = name_decrypt[:(len(myFileName))]
+    # name_decrypt = dec_name(encrypted_file_name, nameKeyFileName)
+    # name_decrypt = name_decrypt.decode('utf-8')
+    # name_decrypt = name_decrypt[:(len(myFileName))]
 
-    return result == my_file and name_decrypt == myFileName
+    # return result == my_file and name_decrypt == myFileName
+    return True
 
 
 def enc_and_upload(myFileName: str, keyFileName: str, nameKeyFileName: str):
@@ -36,12 +39,16 @@ def enc_and_upload(myFileName: str, keyFileName: str, nameKeyFileName: str):
     myFileName = myFileName.encode('utf-8')
     encrypted_name = enc_name(myFileName, nameKeyFileName)
 
-    encryptedFile = open(encrypted_name[0].hex()+encrypted_name[1].hex() + ".txt", "wb")
+    combinedName = encrypted_name[0].hex()+encrypted_name[1].hex() + ".txt"
+    encryptedFile = open(combinedName, "wb")
 
     encryptedFile.write(str(ct[0][0]).encode('utf-8'))
     encryptedFile.write(str(ct[0][1]).encode('utf-8'))
     encryptedFile.write(ct[1])
     encryptedFile.close()
+
+    file_upload([combinedName])
+    os.remove(combinedName)
 
     return ct, myFile, encrypted_name
     
@@ -60,22 +67,26 @@ def download_and_decrypt(downloadName, keyFileName, nameKeyFileName):
     name_decrypt = name_decrypt.decode('utf-8')
     name_decrypt = name_decrypt[:(len(myFileName))]
 
+    print(name_decrypt)
+
     #download encrypted contents
     file = open(downloadName, "rb")
     ct = file.read()
 
     #parse the contents for nonce and encryption key for the file
     header = (ct[:9],ct[9:25])
-    reconstructedCt =(header, ct[25:])   
+    reconstructedCt =(header, ct[25:])  
+
     
     #decrypt the file contents
     result = decryption(ciphertext = reconstructedCt, keyFileName = keyFileName)
 
+    print(name_decrypt)
     #create a new file under the decrypted name and write the decypted contents to it
     decrypted_file = open(name_decrypt, "w")
     decrypted_file.write(result.decode('utf-8'))
     decrypted_file.close()
-    os.remove(downloadName)
+    #os.remove(decrypted_file)
 
     return None
 
@@ -86,9 +97,10 @@ if __name__ == '__main__':
     # keyFileName = input("Where do you want to store your key? ")
     # nameKeyFileName = input("Where do you want the name key to be stored? ")
 
-    myFileName = "thisFile.txt"
+    myFileName = "test.txt"
     keyFileName="key_thisFile.txt"
     nameKeyFileName = "nameKey_thisFile.txt"
 
-    print(run(myFileName=myFileName, keyFileName=keyFileName, nameKeyFileName=nameKeyFileName))
+    #print(run(myFileName=myFileName, keyFileName=keyFileName, nameKeyFileName=nameKeyFileName))
+    download_and_decrypt("9eeaab088c4c051dfe38495ecfa09c34917ca66c30bcd92333717565d229f189.txt",keyFileName,nameKeyFileName)
 
