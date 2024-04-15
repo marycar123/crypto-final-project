@@ -69,7 +69,6 @@ def download_and_decrypt(downloadName, keyFileName, nameKeyFileName):
     #download encrypted contents
     file = open(downloadName, "rb")
     ct = file.read()
-    file.close()
 
     #parse the contents for nonce and encryption key for the file
     header = (ct[:9],ct[9:25])
