@@ -8,17 +8,17 @@ from cryptography.hazmat.primitives.asymmetric import ec
 
 nonce_ctr = 2**28
 
-def encryption(plaintext: bytes, keyFileName: str) -> bytes:
+def encryption(plaintext: bytes, key_file_name: str, enc_title: bytes) -> bytes:
     global nonce_ctr
-    file = open(keyFileName, "r")
+    file = open(key_file_name, "r")
     key = file.read()
 
     key = key.encode('utf-8')
     cipher = AESGCM(key)
 
     #do we need a nonce???? associated data????
-    header = (nonce_ctr, keyFileName)
-    ct = cipher.encrypt(nonce=bytes(str(nonce_ctr), 'ascii'),data=plaintext, associated_data=keyFileName.encode('utf-8'))
+    header = (nonce_ctr, enc_title)
+    ct = cipher.encrypt(nonce=bytes(str(nonce_ctr), 'ascii'),data=plaintext, associated_data=enc_title)
     nonce_ctr += 1
     return header, ct
 
@@ -28,19 +28,19 @@ def keygen(fileName: str) -> bytes:
    file.close()
 
 
-def decryption(ciphertext: bytes, keyFileName: bytes) -> bytes:
+def decryption(ciphertext: bytes, key_file_name: bytes, enc_title: bytes) -> bytes:
     global nonce_ctr
-    file = open(keyFileName, "r")
+    file = open(key_file_name, "r")
     key = file.read()
     key = key.encode('utf-8')
 
     cipher = AESGCM(key)
-    pt = cipher.decrypt(data=ciphertext[1], associated_data=bytes(ciphertext[0][1], 'ascii'), nonce=bytes(str(ciphertext[0][0]), 'ascii'))
+    pt = cipher.decrypt(data=ciphertext[1], associated_data=enc_title, nonce=bytes(str(ciphertext[0][0]), 'ascii'))
     return pt 
 
 
-def enc_name(pt: bytes, keyFileName: str) -> bytes:
-    file = open(keyFileName, "r")
+def enc_name(pt: bytes, key_file_name: str) -> bytes:
+    file = open(key_file_name, "r")
     key = file.read()
     key = key.encode('utf-8')
 
@@ -52,8 +52,8 @@ def enc_name(pt: bytes, keyFileName: str) -> bytes:
     ct = encryptor.update(pt) + encryptor.finalize()
     return (iv, ct)
 
-def dec_name(ct: bytes, keyFileName: str) -> bytes: 
-    file = open(keyFileName, "r")
+def dec_name(ct: bytes, key_file_name: str) -> bytes: 
+    file = open(key_file_name, "r")
     key = file.read()
     key = key.encode('utf-8')
     file.close()
