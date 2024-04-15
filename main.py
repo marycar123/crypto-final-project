@@ -5,7 +5,7 @@ from etoe import decryption, encryption, keygen, enc_name, dec_name
 def run(myFileName: str, keyFileName: str, nameKeyFileName: str) -> bool:
 
     #encrypts everything
-    ct, my_file, encrypted_file = enc_and_upload(myFileName, keyFileName, nameKeyFileName)
+    ct, my_file, encrypted_file_name = enc_and_upload(myFileName, keyFileName, nameKeyFileName)
     
 
     #decrypting        
@@ -14,7 +14,7 @@ def run(myFileName: str, keyFileName: str, nameKeyFileName: str) -> bool:
 
     #checking name decryption
 
-    name_decrypt = dec_name(encrypted_file, nameKeyFileName)
+    name_decrypt = dec_name(encrypted_file_name, nameKeyFileName)
     name_decrypt = name_decrypt.decode('utf-8')
     name_decrypt = name_decrypt[:(len(myFileName))]
 
