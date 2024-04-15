@@ -35,7 +35,8 @@ def decryption(ciphertext: bytes, keyFileName: bytes) -> bytes:
     key = key.encode('utf-8')
 
     cipher = AESGCM(key)
-    pt = cipher.decrypt(data=ciphertext[1], associated_data=bytes(ciphertext[0][1], 'ascii'), nonce=bytes(str(ciphertext[0][0]), 'ascii'))
+
+    pt = cipher.decrypt(data=ciphertext[1], associated_data=ciphertext[0][1], nonce=ciphertext[0][0])
     return pt 
 
 
