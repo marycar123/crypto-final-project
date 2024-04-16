@@ -9,6 +9,7 @@ from cryptography.hazmat.primitives.asymmetric import ec
 nonce_ctr = 2**28
 
 def encryption(plaintext: bytes, key_file_name: str, enc_title: bytes) -> bytes:
+    print(enc_title)
     global nonce_ctr
     file = open(key_file_name, "r")
     key = file.read()
@@ -18,8 +19,9 @@ def encryption(plaintext: bytes, key_file_name: str, enc_title: bytes) -> bytes:
 
     #do we need a nonce???? associated data????
     header = (nonce_ctr, enc_title)
-    ct = cipher.encrypt(nonce=bytes(str(nonce_ctr), 'ascii'),data=plaintext, associated_data=enc_title)
+    ct = cipher.encrypt(nonce=bytes(str(nonce_ctr), 'ascii'),data=plaintext, associated_data=bytes(str(enc_title), 'ascii'))
     nonce_ctr += 1
+    print(ct)
     return header, ct
 
 def keygen(fileName: str) -> bytes:
@@ -35,7 +37,7 @@ def decryption(ciphertext: bytes, key_file_name: bytes, enc_title: bytes) -> byt
     key = key.encode('utf-8')
 
     cipher = AESGCM(key)
-    pt = cipher.decrypt(data=ciphertext[1], associated_data=enc_title, nonce=bytes(str(ciphertext[0][0]), 'ascii'))
+    pt = cipher.decrypt(data=ciphertext[1], associated_data=bytes(str(enc_title), 'ascii'), nonce=bytes(str(ciphertext[0][0]), 'ascii'))
     return pt 
 
 
@@ -75,3 +77,7 @@ def pad_file_name(name: str) -> str:
     padding_length = 16 - (len(name) % 16)
     padding = bytes([padding_length]) * padding_length
     return name + padding
+
+def unpad_file_name(padded_name: str) -> str:
+    padding_length = ord(padded_name[-1])
+    return padded_name[:-padding_length]
