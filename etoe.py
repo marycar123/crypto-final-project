@@ -43,6 +43,7 @@ def enc_name(pt: bytes, key_file_name: str) -> bytes:
     file = open(key_file_name, "r")
     key = file.read()
     key = key.encode('utf-8')
+    print(key)
 
     iv = os.urandom(16)
 
@@ -62,6 +63,7 @@ def dec_name(ct: bytes, key_file_name: str) -> bytes:
     cyt: bytes = b'0'
 
     iv, cyt = ct
+    print(key)
 
     #check to see if this parses for the IV right
     cipher = Cipher(AES256(key), modes.CBC(iv))

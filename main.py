@@ -38,9 +38,12 @@ def enc_and_upload(file_name: str, key_file_name: str, namekey_file_name: str):
     #encrypting file and giving the key store in that file's keyFile
     ct=encryption(myFile, key_file_name, encrypted_name)    
     
+    print(ct)
+    print(key_file_name)
+    print(encrypted_name)
 
-
-
+    print(len(iv.hex()))
+    print(len(encrypted_name.hex()))
     encryptedFile = open(iv.hex()+encrypted_name.hex() + ".txt", "wb")
 
     encryptedFile.write(str(ct[0][0]).encode('utf-8'))
@@ -56,12 +59,14 @@ def download_and_decrypt(download_name: str, key_file_name: str, name_key_file_n
     file_download(download_name)
 
     #breaks the given file name down to IV and encrypted
+    print(bytes.fromhex(download_name[:32]))
     encrypted_bytes_1 = bytes.fromhex(download_name[:32])
     encrypted_bytes_2 = bytes.fromhex(download_name[32:64])
     name_tuple = (encrypted_bytes_1, encrypted_bytes_2)
 
     #decypt and prase the name to get the origional file name
     name_decrypt = dec_name(name_tuple, name_key_file_name)
+    print(name_decrypt)
     name_decrypt = name_decrypt.decode('utf-8')
     name_decrypt = name_decrypt[:(len(name_key_file_name))]
 
@@ -72,9 +77,12 @@ def download_and_decrypt(download_name: str, key_file_name: str, name_key_file_n
     #parse the contents for nonce and encryption key for the file
     header = (ct[:9],ct[9:25])
     reconstructedCt =(header, ct[25:])   
+    print(reconstructedCt)
+    print(key_file_name)
+    print(encrypted_bytes_2)
     
     #decrypt the file contents
-    result = decryption(ciphertext = reconstructedCt, key_file_name=key_file_name,enc_title= encrypted_bytes_1)
+    result = decryption(ciphertext = reconstructedCt, key_file_name=key_file_name,enc_title= encrypted_bytes_2)
 
     #create a new file under the decrypted name and write the decypted contents to it
     decrypted_file = open(name_decrypt, "w")
@@ -95,6 +103,7 @@ if __name__ == '__main__':
     key_file_name="key_thisFile.txt"
     namekey_file_name = "nameKey_thisFile.txt"
 
-    #print(run(myFileName=myFileName, keyFileName=keyFileName, nameKeyFileName=nameKeyFileName))
-    download_and_decrypt("23f2673bc3f956ba88e673fb4c83dd067943500b429f0aae732d36315bedf13d.txt",key_file_name, namekey_file_name)
+    #print(run(file_name, key_file_name, namekey_file_name))
+    enc_and_upload(file_name, key_file_name, namekey_file_name)
+    download_and_decrypt("8416a6f404060437d8b9204502840a933b10614e159c76abfcfe44cd226312fe.txt",key_file_name, namekey_file_name)
 
