@@ -4,7 +4,7 @@ from upload_download import file_upload, file_download
 import os
 
 
-def run(myFileName: str, keyFileName: str, nameKeyFileName: str) -> bool:
+def run(myFileName: str, keyFileName: str, nameKeyFileName: str) -> bytes:
 
     #encrypts everything
     ct, my_file, encrypted_file_name = enc_and_upload(myFileName, keyFileName, nameKeyFileName)
@@ -21,7 +21,7 @@ def run(myFileName: str, keyFileName: str, nameKeyFileName: str) -> bool:
     # name_decrypt = name_decrypt[:(len(myFileName))]
 
     # return result == my_file and name_decrypt == myFileName
-    return True
+    return encrypted_file_name
 
 
 def enc_and_upload(myFileName: str, keyFileName: str, nameKeyFileName: str):
@@ -29,23 +29,30 @@ def enc_and_upload(myFileName: str, keyFileName: str, nameKeyFileName: str):
     myFile = file.read()
     myFile = myFile.encode('utf-8')
 
-    #Key generation, will store key at this file 
-    keygen(keyFileName)
-    #encrypting file and giving the key store in that file's keyFile
-    ct=encryption(myFile, keyFileName)    
-    
-
     keygen(nameKeyFileName)
     myFileName = myFileName.encode('utf-8')
     encrypted_name = enc_name(myFileName, nameKeyFileName)
+
+    #Key generation, will store key at this file 
+    keygen(keyFileName)
+    #encrypting file and giving the key store in that file's keyFile
+    ct=encryption(myFile, keyFileName,encrypted_name[1])    
+    
+
+
 
     combinedName = encrypted_name[0].hex()+encrypted_name[1].hex() + ".txt"
     encryptedFile = open(combinedName, "wb")
 
     encryptedFile.write(str(ct[0][0]).encode('utf-8'))
-    encryptedFile.write(str(ct[0][1]).encode('utf-8'))
+    #encryptedFile.write(str(ct[0][1]).encode('utf-8'))
     encryptedFile.write(ct[1])
     encryptedFile.close()
+    print("testing****************************")
+    print(f"Name: {encrypted_name[1]}")
+    print(f"Nonce: {ct[0][0]}")
+    print(f"KeyFile Name: {ct[0][1]}")
+    print(f"CT: {ct[1]}")
 
     file_upload([combinedName])
     os.remove(combinedName)
@@ -74,8 +81,14 @@ def download_and_decrypt(downloadName, keyFileName, nameKeyFileName):
     ct = file.read()
 
     #parse the contents for nonce and encryption key for the file
-    header = (ct[:9],ct[9:25])
-    reconstructedCt =(header, ct[25:])  
+    #header = (ct[:9],ct[9:25])
+    header = (ct[:9], encrypted_bytes_2)
+    reconstructedCt =(header, ct[9:])
+    print("testing****************************")
+    print(f"Name: {encrypted_bytes_2}")
+    print(f"Nonce: {reconstructedCt[0][0]}")
+    print(f"KeyFile Name: {reconstructedCt[0][1]}")
+    print(f"CT: {reconstructedCt[1]}")  
 
     
     #decrypt the file contents
@@ -97,10 +110,10 @@ if __name__ == '__main__':
     # keyFileName = input("Where do you want to store your key? ")
     # nameKeyFileName = input("Where do you want the name key to be stored? ")
 
-    myFileName = "test.txt"
-    keyFileName="key_thisFile.txt"
-    nameKeyFileName = "nameKey_thisFile.txt"
+    myFileName = "test_2.txt"
+    keyFileName="test2_1_key.txt"
+    nameKeyFileName = "testName2_1_key.txt"
 
     #print(run(myFileName=myFileName, keyFileName=keyFileName, nameKeyFileName=nameKeyFileName))
-    download_and_decrypt("9eeaab088c4c051dfe38495ecfa09c34917ca66c30bcd92333717565d229f189.txt",keyFileName,nameKeyFileName)
+    download_and_decrypt("c22813fc62ea3cfe96c260c4cbdfdb62398a6d6dceac2bca4f3d35b7c030809b.txt",keyFileName,nameKeyFileName)
 
