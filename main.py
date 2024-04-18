@@ -42,7 +42,7 @@ def download_and_decrypt(download_name, key_file_name, name_key_file_name):
     name_tuple = (encrypted_bytes_1, encrypted_bytes_2)
 
 
-    #decypt and prase the name to get the origional file name
+    #decypt and parse the name to get the original file name
     name_decrypt = dec_name(name_tuple, name_key_file_name)
     name_decrypt = name_decrypt.decode('utf-8')
     name_decrypt = name_decrypt[:(len(my_file_name))]
@@ -69,15 +69,10 @@ def download_and_decrypt(download_name, key_file_name, name_key_file_name):
     return None
 
 
-
 if __name__ == '__main__':
-    # myFileName = input("Enter a file Name: ")
-    # keyFileName = input("Where do you want to store your key? ")
-    # nameKeyFileName = input("Where do you want the name key to be stored? ")
-
-    my_file_name = "test.txt"
-    key_file_name="key_thisFile.txt"
-    name_key_file_name = "nameKey_thisFile.txt"
+    my_file_name = input("Enter a file Name: ")
+    key_file_name = input("Where do you want to store your key? ")
+    name_key_file_name = input("Where do you want the name key to be stored? ")
     ct, my_file, combined_name = enc_and_upload(my_file_name, key_file_name, name_key_file_name)
     download_and_decrypt(combined_name,key_file_name,name_key_file_name)
 
