@@ -29,7 +29,6 @@ def enc_and_upload(my_file_name: str, key_file_name: str, name_key_file_name: st
     file_upload([combined_name])
     os.remove(combined_name)
 
-    return ct, my_file, combined_name
     
 def download_and_decrypt(download_name, key_file_name, name_key_file_name):
 
@@ -70,9 +69,27 @@ def download_and_decrypt(download_name, key_file_name, name_key_file_name):
 
 
 if __name__ == '__main__':
-    my_file_name = input("Enter a file Name: ")
-    key_file_name = input("Where do you want to store your key? ")
-    name_key_file_name = input("Where do you want the name key to be stored? ")
-    ct, my_file, combined_name = enc_and_upload(my_file_name, key_file_name, name_key_file_name)
-    download_and_decrypt(combined_name,key_file_name,name_key_file_name)
+    enc_or_dec: str = ""
+    cont: bool = True
 
+    while cont:
+        while enc_or_dec not in ["UP", "DOWN", "EXIT"]:
+            enc_or_dec = input("Do you want to upload and encrypt or download and decrypt? Enter: UP or DOWN. If you want to exit, enter EXIT: ")
+
+        if enc_or_dec == "EXIT":
+            print("Goodbye have a nice day! :)")
+            cont = False
+
+        elif enc_or_dec == "UP":
+            my_file_name = input("Enter a file Name: ")
+            key_file_name = input("Where do you want to store your key?: ")
+            name_key_file_name = input("Where do you want the name key to be stored?: ")
+            enc_and_upload(my_file_name, key_file_name, name_key_file_name)
+
+        elif enc_or_dec == "DOWN":
+            combined_name = input("What is your encrypted file name?: ")
+            key_file_name = input("Where is the key stored?: ")
+            name_key_file_name = input("Where is the name key stored?: ")
+            download_and_decrypt(combined_name,key_file_name,name_key_file_name)
+
+        enc_or_dec = ""
