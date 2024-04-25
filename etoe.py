@@ -8,7 +8,7 @@ from cryptography.hazmat.primitives.asymmetric import ec
 
 nonce_ctr = 2**28
 
-def encryption(plaintext: bytes, key_file_name: str, associated_data: bytes) -> bytes:
+def encryption(plaintext: bytes, key_file_name: str) -> bytes:
     global nonce_ctr
 
     file = open(key_file_name, "r")
@@ -20,7 +20,7 @@ def encryption(plaintext: bytes, key_file_name: str, associated_data: bytes) -> 
     header = nonce_ctr
     
 
-    ct = cipher.encrypt(nonce=bytes(str(nonce_ctr), 'ascii'),data=plaintext, associated_data=associated_data)
+    ct = cipher.encrypt(nonce=bytes(str(nonce_ctr), 'ascii'),data=plaintext, associated_data=None)
     nonce_ctr += 1
     return header, ct
 
@@ -37,7 +37,7 @@ def decryption(ciphertext: bytes, key_file_name: bytes) -> bytes:
     key = key.encode('utf-8')
 
     cipher = AESGCM(key)
-    pt = cipher.decrypt(data=ciphertext[1], associated_data=ciphertext[0][1], nonce=ciphertext[0][0])
+    pt = cipher.decrypt(data=ciphertext[1], nonce=ciphertext[0], associated_data=None)
     return pt 
 
 
