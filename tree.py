@@ -20,6 +20,9 @@ class Tree:
     def isEmpty(self, idx) -> bool:
         return self.blocks[idx] == None
     
+    def isEmpty(self, leaf, height) -> bool:
+        return self.isEmpty(self.findIdx(leaf, height))
+    
     def findIdx(self, leaf, height)->int:
         idx = leaf
         for i in range(height):

@@ -6,6 +6,7 @@ class Oram:
         self.tree = Tree(height)
         self.max_file_size = max_file_size
         self.file_ids = {}
+        self.counter = 0
 
     def read(self, file_name) -> None:
         ### check to id associated with file_name
@@ -22,12 +23,38 @@ class Oram:
         
         readpath = self.tree.getPath(block.getLeaf())
         for pos in readpath:
-            ## read, decrypt, re-encrypt (diff) and reupload
-            ## if pos==node, keep the file and give it file_name
-            ## else, delete download
+            ## download, decrypt
+            ## if pos==node, download as file_name
+            ## keep track of new file names
             ## note: try reading into buffer from drive instead of whole new file
             pass
+        for pos in readpath:
+            ## upload, encrypt each file in file names
+            pass
+        for pos in readpath:
+            ## delete files excdpt for filename
+            pass
+
         return
+    
+    
+    def write(self, file_name) -> None:
+        self.counter += 1
+        self.file_ids[file_name] = self.counter
+        new_id = self.counter
+        new_leaf = self.tree.randomLeaf()
+        new_height = self.tree.randomHeight()
+        while not self.tree.isEmpty(new_leaf, new_height):
+            new_leaf = self.tree.randomLeaf()
+            new_height = self.tree.randomHeight()
+        pos = self.tree.findIdx(new_leaf, new_height)
+        self.tree.blocks[pos] = Block(new_id, new_leaf, file_name)
+        ## Encrypt file, write to l{pos}
+        path = self.tree.getPath(new_leaf)
+        for file in path:
+            ##download and decrypt
+            ## track names of files downloaded
+            pass
 
 
         ### find id in tree
