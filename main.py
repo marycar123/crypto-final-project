@@ -59,7 +59,6 @@ if __name__ == '__main__':
     # myFileName = input("Enter a file Name: ")
     # keyFileName = input("Where do you want to store your key? ")
     # nameKeyFileName = input("Where do you want the name key to be stored? ")
-    #test
 
     my_file_name = "test.txt"
     ct, my_file = enc_and_upload(my_file_name)
