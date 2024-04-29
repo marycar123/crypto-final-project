@@ -40,8 +40,8 @@ def decryption(ciphertext: bytes, key_file_name: bytes) -> bytes:
     pt = cipher.decrypt(data=ciphertext[1], nonce=ciphertext[0], associated_data=None)
     return pt 
 
-
-def pad_file_name(name: str) -> str:
-    padding_length = 16 - (len(name) % 16)
+##### not ready
+def pad_file_name(file: str) -> str:
+    padding_length = 2**16 - len(file)
     padding = bytes([padding_length]) * padding_length
-    return name + padding
+    return file + padding

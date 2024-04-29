@@ -1,5 +1,7 @@
 from tree import Tree
 from block import Block
+import main
+from shutil import copy
 
 class Oram:
     def __init__(self, height, max_file_size) -> None:
@@ -16,10 +18,11 @@ class Oram:
         node = None
         block: Block = None
         file_id = self.file_ids[file_name]
-        for i in range(self.tree.height):
-            if self.tree.blocks[i] == file_id:
-                node = i
-                block =self.tree.blocks[i]
+        for i in range(len(self.tree.blocks)):
+            if self.tree.blocks[i]:
+                if self.tree.blocks[i].blockID == file_id:
+                    node = i
+                    block =self.tree.blocks[i]
         
         readpath = self.tree.getPath(block.getLeaf())
         for pos in readpath:
@@ -27,12 +30,19 @@ class Oram:
             ## if pos==node, download as file_name
             ## keep track of new file names
             ## note: try reading into buffer from drive instead of whole new file
+            main.download_and_decrypt([f"File_{pos}.txt"], [f"File_{pos}.txt"])
+            print(pos)
             pass
+        copy(f"File_{node}.txt", file_name)
         for pos in readpath:
             ## upload, encrypt each file in file names
+            main.enc_and_upload(f"File_{pos}.txt")
+            print(pos)
             pass
+        ##print("copy file to copy into filename")
         for pos in readpath:
             ## delete files excdpt for filename
+            print(pos)
             pass
 
         return
@@ -54,7 +64,16 @@ class Oram:
         for file in path:
             ##download and decrypt
             ## track names of files downloaded
-            pass
+            main.download_and_decrypt([f"File_{file}.txt"], [f"File_{file}.txt"])            
+            print(file)
+        copy(file_name, f"File_{pos}.txt")
+        for file in path:
+            main.enc_and_upload(f"File_{file}.txt")
+        return
+
+
+        
+
 
 
         ### find id in tree

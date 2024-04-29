@@ -1,5 +1,5 @@
 
-from etoe import decryption, encryption, keygen, enc_name, dec_name
+from etoe import decryption, encryption, keygen
 from upload_download import file_upload, file_download
 from drive_setup import drive_wipe, dummy_data_upload
 import os
@@ -27,8 +27,8 @@ def enc_and_upload(my_file_name: str):
 
     #maybe delete everything in the file before
     encrypted_file = open(my_file_name, "wb")
-    encrypted_file.write(str(ct[0]).encode('utf-8'))
-    encrypted_file.write(ct[1])
+    encrypted_file.write(str(nonce).encode('utf-8'))
+    encrypted_file.write(ct)
     encrypted_file.close()
 
     file_upload([my_file_name])
@@ -71,5 +71,5 @@ if __name__ == '__main__':
     #my_file_name = "test.txt"
     #ct, my_file = enc_and_upload(my_file_name)
     #download_and_decrypt(my_file_name)
-    setup_drive(10)
+    setup_drive(63)
 

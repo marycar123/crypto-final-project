@@ -15,18 +15,21 @@ class Tree:
         return randint(self.size//2, self.size-1)
     
     def randomHeight(self)->int:
-        return randint(0,4)
+        return randint(0,self.height-1)
     
-    def isEmpty(self, idx) -> bool:
+    def randomIndex(self)->int:
+        return randint(0, self.size-1)
+    
+    def isEmptyIdx(self, idx) -> bool:
         return self.blocks[idx] == None
     
     def isEmpty(self, leaf, height) -> bool:
-        return self.isEmpty(self.findIdx(leaf, height))
+        return self.isEmptyIdx(self.findIdx(leaf, height))
     
     def findIdx(self, leaf, height)->int:
         idx = leaf
         for i in range(height):
-            idx = leaf//2
+            idx = (leaf - 1)//2
         return idx
     
     def getPath(self, leaf)->list[int]:
@@ -34,5 +37,5 @@ class Tree:
         for i in range(self.height):
             path[i] = leaf
             if leaf != 0:
-                leaf = leaf // 2
+                leaf = (leaf -1)// 2
         return path
