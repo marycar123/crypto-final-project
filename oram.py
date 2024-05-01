@@ -15,14 +15,8 @@ class Oram:
         if not (file_name in self.file_ids):
             print("file not found")
             return
-        node = None
-        block: Block = None
-        file_id = self.file_ids[file_name]
-        for i in range(len(self.tree.blocks)):
-            if self.tree.blocks[i]:
-                if self.tree.blocks[i].blockID == file_id:
-                    node = i
-                    block =self.tree.blocks[i]
+        
+        node, block = self.findFile(self.file_ids[file_name])
         
         readpath = self.tree.getPath(block.getLeaf())
         for pos in readpath:
@@ -61,16 +55,44 @@ class Oram:
         self.tree.blocks[pos] = Block(new_id, new_leaf, file_name)
         ## Encrypt file, write to l{pos}
         path = self.tree.getPath(new_leaf)
+        ## pad the file to size
+        padding_length, padded_file = self.filePad(file_name)
         for file in path:
             ##download and decrypt
             ## track names of files downloaded
             main.download_and_decrypt([f"File_{file}.txt"], [f"File_{file}.txt"])            
             print(file)
-        copy(file_name, f"File_{pos}.txt")
+        copy(padded_file, f"File_{pos}.txt")
         for file in path:
             main.enc_and_upload(f"File_{file}.txt")
         return
+    
+    def delete(self, file_name) -> None:
+        if not (file_name in self.file_ids):
+            print("file not found")
+            return
+        pos, block = self.findFile(self.file_ids[file_name])
+        self.tree.blocks[pos] = None
+        self.file_ids.pop(file_name)
 
+    def findFile(self, file_id) -> tuple[int, Block]:
+        for i in range(len(self.tree.blocks)):
+            if self.tree.blocks[i]:
+                if self.tree.blocks[i].blockID == file_id:
+                    return (i, self.tree.blocks[i])
+
+
+    def filePad(self, file_name) -> tuple[int, str]:
+        my_file = open(file_name, "r")
+        contents = my_file.read().encode('utf-8')
+        my_file.close()
+        padding_length = 2**16 - len(contents)
+        contents += ("0" * padding_length).encode("utf-8")
+        padded_file = open(f"{file_name}_padded", "w")
+        print(len(contents.decode('utf-8')))
+        padded_file.write(contents.decode("utf-8"))
+        padded_file.close()
+        return (padding_length, f"{file_name}_padded")
 
         
 
