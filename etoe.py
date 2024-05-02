@@ -1,7 +1,6 @@
 """End to end encryption of files."""
 
 import os
-import secrets
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.hazmat.primitives.ciphers import Cipher,modes
 from cryptography.hazmat.primitives.ciphers.algorithms import AES256
@@ -18,9 +17,8 @@ def encryption(plaintext: bytes, key_file_name: str) -> bytes:
     key = key.encode('utf-8')
     cipher = AESGCM(key)
 
-    header = secrets.SystemRandom().randrange(100000000, 999999999)
-
-    ct = cipher.encrypt(nonce=bytes(str(header), 'ascii'),data=plaintext, associated_data=None)
+    header = nonce_ctr    
+    ct = cipher.encrypt(nonce=bytes(str(nonce_ctr), 'ascii'),data=plaintext, associated_data=None)
     nonce_ctr += 1
     return header, ct
 

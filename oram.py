@@ -97,7 +97,6 @@ class Oram:
         padding_length = 2**16 - len(contents)
         contents += ("0" * padding_length).encode("utf-8")
         padded_file = open(f"{file_name}_padded", "w")
-        print(len(contents.decode('utf-8')))
         padded_file.write(contents.decode("utf-8"))
         padded_file.close()
         return (padding_length, f"{file_name}_padded")
@@ -106,5 +105,6 @@ class Oram:
 
 
 
-        ### find id in tree
+    def getFileNames(self):
+        return self.file_ids.keys()
 
