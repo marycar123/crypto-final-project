@@ -44,11 +44,19 @@ class Oram:
     
     def write(self, file_name) -> None:
         self.counter += 1
+        if (file_name in self.file_ids):
+            old_pos = self.findFile(self.file_ids[file_name])
+            old: Block = self.tree.blocks[old_pos]
+            old_leaf = old.getLeaf()
+            self.tree.blocks[old_pos] = None
+        else:
+            old_leaf = -1
+
         self.file_ids[file_name] = self.counter
         new_id = self.counter
         new_leaf = self.tree.randomLeaf()
         new_height = self.tree.randomHeight()
-        while not self.tree.isEmpty(new_leaf, new_height):
+        while not self.tree.isEmpty(new_leaf, new_height) and new_leaf != old_leaf:
             new_leaf = self.tree.randomLeaf()
             new_height = self.tree.randomHeight()
         pos = self.tree.findIdx(new_leaf, new_height)
