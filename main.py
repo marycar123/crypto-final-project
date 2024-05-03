@@ -1,5 +1,6 @@
 
 from etoe import decryption, encryption, keygen
+import oram
 from upload_download import file_upload, file_download
 from drive_setup import drive_wipe, dummy_data_upload
 import os
@@ -64,12 +65,35 @@ def download_and_decrypt(download_names: list[str], file_names: list[str]):
 
 
 if __name__ == '__main__':
-    # myFileName = input("Enter a file Name: ")
-    # keyFileName = input("Where do you want to store your key? ")
-    # nameKeyFileName = input("Where do you want the name key to be stored? ")
+    newUser: bool = False
+    oram = oram.Oram(6, 2**16)
 
-    #my_file_name = "test.txt"
-    #ct, my_file = enc_and_upload(my_file_name)
-    #download_and_decrypt(my_file_name)
-    setup_drive(63)
+    start=input("Do you have a key file set up? Y/N \n")
+    if start == "N":
+        newUser = True
+        keyFile = input("Where would you like to put the key? (file name) \n")
+        keygen(keyFile)
+        setup_drive(63)
+        key_file = keyFile
+
+    if newUser is True:  
+        init = input("What would you like to do? 'U' = Upload/Update File 'X'=Quit \n ")
+    else:
+        init = input("What would you like to do? 'U' = Upload/Update File 'D'=Download File 'X'=Quit \n ")
+
+    while init != 'X':
+        if init=='U':
+
+            keyFile = input("Where is your key file stored? \n")
+            fileName = input("What is the file name? \n")
+            oram.write(fileName)
+            print("File uploaded successfully \n")
+        elif init=="D":
+            keyFile = input("Where is your key file stored? \n")
+            fileName = input("What is the file name? \n")
+            oram.read(fileName)
+            print("File downloaded successfully \n")
+        init = input("What would you like to do? 'U' = Upload/Update File 'D'=Download File 'X'=Quit \n")
+
+
 
