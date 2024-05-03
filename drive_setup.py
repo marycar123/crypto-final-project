@@ -35,4 +35,5 @@ def dummy_data_upload(num_Files: int, key_File_Name) -> None:
     print("upload finished")
     for name in file_Names:
         os.remove(name)
+    return
 
