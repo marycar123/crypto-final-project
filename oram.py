@@ -1,6 +1,7 @@
 from tree import Tree
 from block import Block
 import main
+import os
 from shutil import copy
 
 class Oram:
@@ -17,7 +18,7 @@ class Oram:
             return
         
         node, block = self.findFile(self.file_ids[file_name])
-        
+
         readpath = self.tree.getPath(block.getLeaf())
         for pos in readpath:
             ## download, decrypt
@@ -53,6 +54,7 @@ class Oram:
             old_leaf = -1
 
         self.file_ids[file_name] = self.counter
+        padding_length, padded_file = self.filePad(file_name)
         new_id = self.counter
         new_leaf = self.tree.randomLeaf()
         new_height = self.tree.randomHeight()
@@ -60,11 +62,10 @@ class Oram:
             new_leaf = self.tree.randomLeaf()
             new_height = self.tree.randomHeight()
         pos = self.tree.findIdx(new_leaf, new_height)
-        self.tree.blocks[pos] = Block(new_id, new_leaf, file_name)
+        self.tree.blocks[pos] = Block(new_id, new_leaf, file_name, padding_length)
         ## Encrypt file, write to l{pos}
         path = self.tree.getPath(new_leaf)
         ## pad the file to size
-        padding_length, padded_file = self.filePad(file_name)
         for file in path:
             ##download and decrypt
             ## track names of files downloaded
@@ -91,15 +92,23 @@ class Oram:
 
 
     def filePad(self, file_name) -> tuple[int, str]:
-        my_file = open(file_name, "r")
-        contents = my_file.read().encode('utf-8')
+        my_file = open(file_name, "rb")
+        contents = my_file.read()
         my_file.close()
-        padding_length = 2**16 - len(contents)
-        contents += ("0" * padding_length).encode("utf-8")
-        padded_file = open(f"{file_name}_padded", "w")
-        padded_file.write(contents.decode("utf-8"))
+
+        padding_length = self.max_file_size - len(contents)
+        padded_contents = contents.ljust(self.max_file_size, b'0')
+
+        print(f"max_size: {self.max_file_size}")
+        print(f"padded contents size: {len(padded_contents)}")
+
+        padded_file = open(f"padded_{file_name}", "wb")
+        padded_file.write(padded_contents)
         padded_file.close()
-        return (padding_length, f"{file_name}_padded")
+
+        print(f"padded file size: {os.path.getsize(f"padded_{file_name}")}")
+        
+        return (padding_length, f"padded_{file_name}")
 
         
 
