@@ -104,8 +104,17 @@ class Oram:
         padded_file.close()
 
         return (padding_length, f"padded_{file_name}")
+    
+    def fileUnpad(self, padded_name, file_name, padding) -> str:
+        padded_file = open(padded_name, "rb")
+        contents = padded_file.read(self.max_file_size - padding)
+        padded_file.close()
 
-        
+        unpadded_file = open(file_name, "wb")
+        unpadded_file.write(contents)
+        unpadded_file.close()
+
+        return file_name
 
 
 
