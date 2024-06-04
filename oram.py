@@ -99,15 +99,10 @@ class Oram:
         padding_length = self.max_file_size - len(contents)
         padded_contents = contents.ljust(self.max_file_size, b'0')
 
-        print(f"max_size: {self.max_file_size}")
-        print(f"padded contents size: {len(padded_contents)}")
-
         padded_file = open(f"padded_{file_name}", "wb")
         padded_file.write(padded_contents)
         padded_file.close()
 
-        print(f"padded file size: {os.path.getsize(f"padded_{file_name}")}")
-        
         return (padding_length, f"padded_{file_name}")
 
         
